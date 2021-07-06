@@ -5,7 +5,11 @@
   "main": "app.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "serve": "node server.js"
+    "serve": "node server.js",
+    "development": "mix",
+    "watch": "mix watch",
+    "watch-poll": "mix watch -- --watch-options-poll=1000",
+    "production": "mix --production"
   },
   "keywords": [],
   "author": "",
@@ -16,5 +20,11 @@
     "express": "^4.17.1",
     "express-ejs-layouts": "^2.5.1",
     "mongoose": "^5.13.2"
+  },
+  "devDependencies": {
+    "laravel-mix": "^6.0.25",
+    "resolve-url-loader": "^4.0.0",
+    "sass": "^1.35.1",
+    "sass-loader": "^12.1.0"
   }
 }
