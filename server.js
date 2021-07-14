@@ -8,6 +8,7 @@ const mongoose = require('mongoose')
 const session = require('express-session')
 const flash = require('express-flash')
 const MongoStore = require('connect-mongo');
+const passport = require('passport')
 
 const port = process.env.PORT || 3000
 
@@ -19,6 +20,7 @@ connection.once('open', () => {
 }).catch(err => {
     console.log("Connection Failed")
 })
+
 
 // Session store
 const mongoStore = MongoStore.create({
@@ -37,10 +39,18 @@ app.use(session({
     }
 }))
 
+// Passport config. This configuration should always be after session config
+const passportInit = require('./app/config/passport')
+passportInit(passport)
+app.use(passport.initialize())
+app.use(passport.session())
+
 
 // Assets
 app.use(express.static('public'));
+app.use(express.urlencoded({ extended: false }))
 app.use(express.json())
+
 
 app.set('views', path.join(__dirname, '/resources/views'))
 app.set('view engine', 'ejs')
@@ -51,6 +61,7 @@ app.use(flash())
 // Global middelwares
 app.use((req, res, next) => {
     res.locals.session = req.session
+    res.locals.user = req.user
     next()
 })
 
