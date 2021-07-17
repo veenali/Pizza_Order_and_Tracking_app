@@ -9,6 +9,7 @@ const session = require('express-session')
 const flash = require('express-flash')
 const MongoStore = require('connect-mongo');
 const passport = require('passport')
+const Emitter = require('events')
 
 const port = process.env.PORT || 3000
 
@@ -27,6 +28,13 @@ const mongoStore = MongoStore.create({
     mongoUrl: 'mongodb://localhost:27017/pizza',
     collectionName: 'sessions',
 })
+
+
+// Event emitter -- given by node under events package(already there no need to install it)
+const eventEmitter = new Emitter()
+app.set('eventEmitter', eventEmitter)  //So that we are able to access the variable in the statusController.js file
+
+
 
 // Session config
 app.use(session({
@@ -71,4 +79,26 @@ app.use('/', webRoutes)
 
 
 
-app.listen(port, () => console.log(`App listening on ${port} port!`))
+const server = app.listen(port, () => console.log(`App listening on ${port} port!`))
+
+
+
+// All socket connections
+const io = require('socket.io')(server)
+io.on('connection', (socket) => {
+    // Join 
+    socket.on('join', (roomName) => {
+        // Private room created for each order
+        socket.join(roomName)
+    })
+})
+
+// The event that was emitted from statusController.js file 
+eventEmitter.on('orderUpdated', (data) => {
+    io.to(`order_${data.id}`).emit('orderUpdated', data)
+})
+
+// The event that was emitted from customers/orderController.js file 
+eventEmitter.on('orderPlaced', (data) => {
+    io.to('adminRoom').emit('orderPlaced', data)
+})
