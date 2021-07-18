@@ -82,7 +82,7 @@ updateStatus(order);
 // Socket on client side ....... Add script tag on the layout folder to make the function available here.
 // Whatever code is present here will run whenever we are on the client page
 let socket = io()
-initAdmin(socket)
+
 // Join 
 // When we reach the order page we need to notify the server that we have reached that page and create a private room
 if (order) {
@@ -92,6 +92,7 @@ if (order) {
 // Admin 
 let adminAreaPath = window.location.pathname
 if(adminAreaPath.includes('admin')){
+    initAdmin(socket)
     socket.emit('join', 'adminRoom')
 }
 

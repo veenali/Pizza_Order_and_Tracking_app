@@ -14,7 +14,7 @@ const Emitter = require('events')
 const port = process.env.PORT || 3000
 
 // Database connection
-mongoose.connect('mongodb://localhost:27017/pizza', { useNewUrlParser: true, useUnifiedTopology: true, useCreateIndex: true, useFindAndModify: true });
+mongoose.connect(process.env.MONGO_CONNECTION_URL, { useNewUrlParser: true, useUnifiedTopology: true, useCreateIndex: true, useFindAndModify: true });
 const connection = mongoose.connection;
 connection.once('open', () => {
     console.log("Database connected....")
@@ -25,7 +25,7 @@ connection.once('open', () => {
 
 // Session store
 const mongoStore = MongoStore.create({
-    mongoUrl: 'mongodb://localhost:27017/pizza',
+    mongoUrl: process.env.MONGO_CONNECTION_URL,
     collectionName: 'sessions',
 })
 
@@ -77,6 +77,9 @@ app.use((req, res, next) => {
 const webRoutes = require('./routes/web')
 app.use('/', webRoutes)
 
+app.use((req, res) => {
+    res.status(404).render('errors/404')
+})
 
 
 const server = app.listen(port, () => console.log(`App listening on ${port} port!`))
